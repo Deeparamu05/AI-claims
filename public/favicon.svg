@@ -1,0 +1,8 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Rounded square background -->
+  <rect width="64" height="64" rx="14" fill="#1877F2"/>
+  
+  <!-- Shield icon -->
+  <path d="M32 16C32 16 24 18 20 18C20 18 20 28 20 32C20 40 32 48 32 48C32 48 44 40 44 32C44 28 44 18 44 18C40 18 32 16 32 16Z" fill="white"/>
+  <path d="M32 20C32 20 26 21.5 23 21.5C23 21.5 23 29.5 23 32C23 38 32 44 32 44C32 44 41 38 41 32C41 29.5 41 21.5 41 21.5C38 21.5 32 20 32 20Z" fill="#1877F2"/>
+</svg>
