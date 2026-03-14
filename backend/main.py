@@ -40,6 +40,46 @@ for folder in [UPLOAD_DIR, "data"]:
 # Initialize database
 database.init_db()
 
+
+def ensure_admin_user():
+    """Create or update an admin account using deployment environment variables."""
+    admin_username = os.getenv("ADMIN_USERNAME", "admin")
+    admin_email = os.getenv("ADMIN_EMAIL", "admin@claims.local")
+    admin_password = os.getenv("ADMIN_PASSWORD")
+
+    # Skip bootstrap when no password is provided.
+    if not admin_password:
+        return
+
+    db = database.SessionLocal()
+    try:
+        admin_user = db.query(models.User).filter(models.User.username == admin_username).first()
+        hashed_password = auth.get_password_hash(admin_password)
+
+        if admin_user is None:
+            admin_user = models.User(
+                username=admin_username,
+                email=admin_email,
+                hashed_password=hashed_password,
+                role="admin",
+                status="approved",
+                is_active=True,
+            )
+            db.add(admin_user)
+        else:
+            admin_user.email = admin_email
+            admin_user.hashed_password = hashed_password
+            admin_user.role = "admin"
+            admin_user.status = "approved"
+            admin_user.is_active = True
+
+        db.commit()
+    finally:
+        db.close()
+
+
+ensure_admin_user()
+
 @app.post("/token")
 async def login_for_access_token(db: Session = Depends(database.get_db), form_data: OAuth2PasswordRequestForm = Depends()):
     user = db.query(models.User).filter(models.User.username == form_data.username).first()
