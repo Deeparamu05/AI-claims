@@ -7,7 +7,7 @@ import {
   Star, ShieldAlert, ShieldCheck
 } from 'lucide-react';
 
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? 'http://localhost:8000' : '');
 
 const ClaimsAssistantApp = () => {
   const [view, setViewState] = useState('landing');

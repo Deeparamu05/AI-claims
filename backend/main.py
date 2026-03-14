@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException, status, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
 import os
@@ -10,15 +11,21 @@ import models, database, auth
 
 app = FastAPI(title="ClaimsApp Professional API")
 
+# Allow frontend URL to be injected in deployment environments like Render.
+frontend_url = os.getenv("FRONTEND_URL")
+allowed_origins = [
+    "http://localhost:5174",
+    "http://127.0.0.1:5174",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+if frontend_url:
+    allowed_origins.append(frontend_url)
+
 # Setup CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5174",
-        "http://127.0.0.1:5174",
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -233,3 +240,9 @@ async def ai_chat(query: str, current_user: models.User = Depends(auth.get_curre
         return {"response": responses["coverage"]}
     else:
         return {"response": responses["default"]}
+
+
+STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
+if os.path.isdir(STATIC_DIR):
+    # Mount the compiled React app for single-service deployments.
+    app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="frontend")
